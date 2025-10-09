@@ -170,7 +170,7 @@ class Queue:
 class PriorityQueue:
     """
       Implements a priority queue data structure. Each inserted item
-      has a priority associated with it and the client is usually interested
+      has a priority attssociated with it and the client is usually interested
       in quick retrieval of the lowest-priority item in the queue. This
       data structure allows O(1) access to the lowest-priority item.
     """
