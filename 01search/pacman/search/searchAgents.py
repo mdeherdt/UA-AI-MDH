@@ -385,19 +385,11 @@ def cornersHeuristic(state: Any, problem: CornersProblem):
     max = 0
 
     for corner in unvisited_corners:
-        distance = calculateManhattanDistance(state[0],corner)
+        distance = util.manhattanDistance(state[0],corner)
         if  distance > max:
             max = distance
 
     return max
-
-def calculateManhattanDistance(coor_1,coor_2):
-    cur_pos_x, cur_pos_y = coor_1
-    cor_pos_x, cor_pos_y = coor_2
-
-    distance = abs(cur_pos_x - cor_pos_x)+ abs(cur_pos_y - cor_pos_y)
-
-    return distance
 
 
 
@@ -493,7 +485,25 @@ def foodHeuristic(state: Tuple[Tuple, List[List]], problem: FoodSearchProblem):
     """
     position, foodGrid = state
     "*** YOUR CODE HERE ***"
-    return 0
+
+    if (foodGrid.count() == 0):
+        return 0
+
+    foodList = foodGrid.asList()
+    max_distance = 0
+    for food in foodList:
+        distance = util.manhattanDistance(position, food)
+        if distance > max_distance:
+            max_distance = distance
+
+    max_dist_food = 0
+    for food in foodList:
+        for other_food in foodList:
+            distance = util.manhattanDistance(food, other_food)
+            if distance > max_dist_food:
+                max_dist_food = distance
+
+    return max(max_distance, max_dist_food)
 
 class ClosestDotSearchAgent(SearchAgent):
     "Search for all food using a sequence of searches"
