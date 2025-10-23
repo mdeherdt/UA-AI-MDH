@@ -64,36 +64,6 @@ Grading: Please run the below command to see if your implementation passes all t
 python autograder.py -q q7
 ```
 
-
-
-# Optional (not graded)
-
-------
-
-## Q8: Suboptimal Search
-
-Sometimes, even with A* and a good heuristic, finding the optimal path through all the dots is hard. In these cases, we’d still like to find a reasonably good path, quickly. In this section, you’ll write an agent that always greedily eats the closest dot. `ClosestDotSearchAgent` is implemented for you in `searchAgents.py`, but it’s missing a key function that finds a path to the closest dot.
-
-Implement the function `findPathToClosestDot` in `searchAgents.py`. Our agent solves this maze (suboptimally!) in under a second with a path cost of 350:
-
-```shell
-python pacman.py -l bigSearch -p ClosestDotSearchAgent -z .5
-```
-
-
-
-*Hint*: The quickest way to complete `findPathToClosestDot` is to fill in the `AnyFoodSearchProblem`, which is missing its goal test. Then, solve that problem with an appropriate search function. The solution should be very short!
-
-Your `ClosestDotSearchAgent` won’t always find the shortest possible path through the maze. Make sure you understand why and try to come up with a small example where repeatedly going to the closest dot does not result in finding the shortest path for eating all the dots.
-
-Grading: Please run the below command to see if your implementation passes all the autograder test cases.
-
-```
-python autograder.py -q q8
-```
-
-
-
 ---
 
 These exercises are heavily based on the projects from [Introduction to Artificial Intelligence at UC Berkeley](https://ai.berkeley.edu/home.html).
