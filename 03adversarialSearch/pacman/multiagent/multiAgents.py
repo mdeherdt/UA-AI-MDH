@@ -10,7 +10,7 @@
 # (denero@cs.berkeley.edu) and Dan Klein (klein@cs.berkeley.edu).
 # Student side autograding was added by Brad Miller, Nick Hay, and
 # Pieter Abbeel (pabbeel@cs.berkeley.edu).
-
+import math
 
 from util import manhattanDistance
 from game import Directions
@@ -74,8 +74,35 @@ class ReflexAgent(Agent):
         newGhostStates = successorGameState.getGhostStates()
         newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
 
-        "*** YOUR CODE HERE ***"
-        return successorGameState.getScore()
+
+        closestGhostDist = float('inf')
+        for ghost_state in newGhostStates:
+            dist = util.manhattanDistance(newPos, ghost_state.getPosition())
+            closestGhostDist = min(closestGhostDist, dist)
+
+
+        if closestGhostDist <= 1:
+            return float('-inf')
+
+
+        foodList = newFood.asList()
+
+        if not foodList:
+            return float('inf')
+
+        closestFoodDist = float('inf')
+        for food_pos in foodList:
+            dist = util.manhattanDistance(newPos, food_pos)
+            closestFoodDist = min(closestFoodDist, dist)
+
+
+        score = successorGameState.getScore()
+
+        score += 1.0 / closestFoodDist
+
+        score -= 1.0 / closestGhostDist
+
+        return score
 
 def scoreEvaluationFunction(currentGameState: GameState):
     """
@@ -135,8 +162,60 @@ class MinimaxAgent(MultiAgentSearchAgent):
         gameState.isLose():
         Returns whether or not the game state is a losing state
         """
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+
+        best_action = None
+        max_value = float('-inf')
+        pacman_agent_index = 0
+
+        legal_actions = gameState.getLegalActions(pacman_agent_index)
+
+        for action in legal_actions:
+            successor_state = gameState.generateSuccessor(pacman_agent_index, action)
+
+            # Start de recursie voor de *eerste geest* (agent 1) op diepte 0
+            # De score wordt bepaald door de 'min' speler (het eerste spook)
+            score = self._minimax(successor_state, 1, 0)
+
+            if score > max_value:
+                max_value = score
+                best_action = action
+
+        return best_action
+
+    def _minimax(self, state: GameState, agentIndex: int, depth: int):
+
+        if depth == self.depth or state.isWin() or state.isLose():
+            return self.evaluationFunction(state)
+
+        num_agents = state.getNumAgents()
+        legal_actions = state.getLegalActions(agentIndex)
+
+        if not legal_actions:
+            return self.evaluationFunction(state)
+
+        if agentIndex == 0:
+            max_value = float('-inf')
+            for action in legal_actions:
+                successor = state.generateSuccessor(agentIndex, action)
+                value = self._minimax(successor, 1, depth)
+                max_value = max(max_value, value)
+            return max_value
+
+
+        else:  # MIN-speler (Spook)
+            min_value = float('inf')
+            next_agent_index = (agentIndex + 1) % state.getNumAgents()
+            next_depth = depth
+
+            if next_agent_index == 0:
+                next_depth = depth + 1
+
+            for action in legal_actions:
+                successor = state.generateSuccessor(agentIndex, action)
+                value = self._minimax(successor, next_agent_index, next_depth)
+                min_value = min(min_value, value)
+
+            return min_value
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
     """
