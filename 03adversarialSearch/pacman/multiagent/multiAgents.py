@@ -312,18 +312,94 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
         All ghosts should be modeled as choosing uniformly at random from their
         legal moves.
         """
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        best_action = None
+        max_value = float('-inf')
+        pacman_agent_index = 0
+
+        legal_actions = gameState.getLegalActions(pacman_agent_index)
+
+        for action in legal_actions:
+            successor_state = gameState.generateSuccessor(pacman_agent_index, action)
+            score = self._expectimax(successor_state, 1, 0)
+            if score > max_value:
+                max_value = score
+                best_action = action
+        return best_action
+
+    def _expectimax(self, state: GameState, agentIndex: int, depth: int):
+        if depth == self.depth or state.isWin() or state.isLose():
+            return self.evaluationFunction(state)
+
+        num_agents = state.getNumAgents()
+        legal_actions = state.getLegalActions(agentIndex)
+
+        if not legal_actions:
+            return self.evaluationFunction(state)
+
+        if agentIndex == 0:
+            max_value = float('-inf')
+            for action in legal_actions:
+                successor = state.generateSuccessor(agentIndex, action)
+                value = self._expectimax(successor, 1, depth)
+                max_value = max(max_value, value)
+            return max_value
+        else:
+            total_value = 0
+            next_agent_index = (agentIndex + 1) % state.getNumAgents()
+            next_depth = depth
+
+            if next_agent_index == 0:
+                next_depth = depth + 1
+
+            for action in legal_actions:
+                successor = state.generateSuccessor(agentIndex, action)
+                value = self._expectimax(successor, next_agent_index, next_depth)
+                total_value += value
+            expected_value = total_value / len(legal_actions)
+
+            return expected_value
+
 
 def betterEvaluationFunction(currentGameState: GameState):
     """
     Your extreme ghost-hunting, pellet-nabbing, food-gobbling, unstoppable
     evaluation function (question 5).
 
-    DESCRIPTION: <write something here so we know what you did>
+    DESCRIPTION:
     """
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    pac = currentGameState.getPacmanPosition()
+    food = currentGameState.getFood().asList()
+    ghosts = currentGameState.getGhostStates()
+    capsules = currentGameState.getCapsules()
+
+    value = float(currentGameState.getScore())
+
+    value -= 4.0 * len(food)
+
+    if food:
+        d_food = min(manhattanDistance(pac, f) for f in food)
+        value += 3.0 / (d_food + 1.0)
+
+    danger_close = False
+    for g in ghosts:
+        d = manhattanDistance(pac, g.getPosition())
+        if g.scaredTimer > 0:
+            value += 10.0 / (d + 1.0)
+            if d == 0:
+                value += 50.0  # Hextra bonus: spook gegeten
+        else:
+            if d <= 1:
+                value -= 1000.0
+                danger_close = True
+            else:
+                value -= 5.0 / d
+
+    if capsules:
+        d_cap = min(manhattanDistance(pac, c) for c in capsules)
+        if danger_close:
+            value += 15.0 / (d_cap + 1.0)
+
+    return value
 
 # Abbreviation
 better = betterEvaluationFunction
