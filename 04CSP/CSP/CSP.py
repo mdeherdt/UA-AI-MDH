@@ -1,5 +1,7 @@
 import random
 import copy
+from copy import deepcopy
+import math
 
 from typing import Set, Dict, List, TypeVar, Optional
 from abc import ABC, abstractmethod
@@ -60,7 +62,8 @@ class CSP(ABC):
             :param assignment: dict (Variable -> value)
         """
         # TODO: Implement CSP::isComplete (problem 1)
-        pass
+
+        return len(assignment) == len(self.variables)
 
     @abstractmethod
     def isValidPairwise(self, var1: Variable, val1: Value, var2: Variable, val2: Value) -> bool:
@@ -76,7 +79,24 @@ class CSP(ABC):
             Note that constraints are symmetrical, so you don't need to check them in both directions.
         """
         # TODO: Implement CSP::isValid (problem 1)
-        pass
+
+        assigned_variables_list = list(assignment.keys())
+
+        num_assigned = len(assigned_variables_list)
+
+        for i in range(num_assigned):
+            var1 = assigned_variables_list[i]
+            val1 = assignment[var1]
+            for j in range(i+1,num_assigned):
+                var2 = assigned_variables_list[j]
+                val2 = assignment[var2]
+
+                if var2 in self.neighbors(var1):
+                    if not self.isValidPairwise(var1,val1,var2,val2):
+                        return False
+
+        return True
+
 
     def solveBruteForce(self, initialAssignment: Dict[Variable, Value] = dict()) -> Optional[Dict[Variable, Value]]:
         """ Called to solve this CSP with brute force technique.
@@ -91,7 +111,22 @@ class CSP(ABC):
             :return: a complete and valid assignment if one exists, None otherwise.
         """
         # TODO: Implement CSP::_solveBruteForce (problem 1)
-        pass
+
+        if self.isComplete(assignment):
+            return assignment
+
+        var = self.selectVariable(assignment,domains)
+
+        for dom in self.orderDomain(assignment,domains,var):
+            assignment[var] = dom
+            if self.isValid(assignment):
+                result = self._solveBruteForce(assignment,domains)
+                if result is not None:
+                    return result
+            del assignment[var]
+        return None
+
+
 
     def solveForwardChecking(self, initialAssignment: Dict[Variable, Value] = dict()) -> Optional[Dict[Variable, Value]]:
         """ Called to solve this CSP with forward checking.
@@ -107,8 +142,31 @@ class CSP(ABC):
             Use `CSP::forwardChecking` and you should no longer need to check if an assignment is valid.
             :return: a complete and valid assignment if one exists, None otherwise.
         """
-        # TODO: Implement CSP::_solveForwardChecking (problem 2)
-        pass
+
+        if self.isComplete(assignment):
+            return assignment
+
+
+
+        var = self.selectVariable(assignment,domains)
+
+        for val in self.orderDomain(assignment,domains,var):
+            assignment[var] = val
+            new_domains = self.forwardChecking(assignment,domains,var)
+            is_dead_end = any(len(new_domains[v]) == 0 for v in self.remainingVariables(assignment))
+
+            if not is_dead_end:
+                result = self._solveForwardChecking(assignment,new_domains)
+                if result is not None:
+                    return result
+
+            del assignment[var]
+        return None
+
+
+
+
+
 
     def forwardChecking(self, assignment: Dict[Variable, Value], domains: Dict[Variable, Set[Value]], variable: Variable) -> Dict[Variable, Set[Value]]:
         """ Implement the forward checking algorithm from the theory lectures.
@@ -119,7 +177,20 @@ class CSP(ABC):
         :return: the new domains after enforcing all constraints.
         """
         # TODO: Implement CSP::forwardChecking (problem 2)
-        pass
+
+        current_val = assignment[variable]
+
+        new_domains = copy.deepcopy(domains)
+
+        for neighbour in self.neighbors(variable):
+            if neighbour not in assignment:
+                for val in new_domains[neighbour].copy():
+                    if not self.isValidPairwise(variable,current_val,neighbour,val):
+                        new_domains[neighbour].remove(val)
+
+        return new_domains
+
+
 
     def selectVariable(self, assignment: Dict[Variable, Value], domains: Dict[Variable, Set[Value]]) -> Variable:
         """ Implement a strategy to select the next variable to assign. """
@@ -127,6 +198,18 @@ class CSP(ABC):
             return random.choice(list(self.remainingVariables(assignment)))
 
         # TODO: Implement CSP::selectVariable (problem 2)
+        min = math.inf
+        best_var = None
+
+        for var in self.remainingVariables(assignment):
+            current_size = len(domains[var])
+            if current_size < min:
+                best_var = var
+                min = current_size
+        return best_var
+
+
+
 
     def orderDomain(self, assignment: Dict[Variable, Value], domains: Dict[Variable, Set[Value]], var: Variable) -> List[Value]:
         """ Implement a smart ordering of the domain values. """
@@ -134,6 +217,25 @@ class CSP(ABC):
             return list(domains[var])
 
         # TODO: Implement CSP::orderDomain (problem 2)
+
+        score_list = []
+
+        for val in domains[var]:
+            score = 0
+            for neighbour in self.neighbors(var):
+                if neighbour in assignment:
+                    continue
+                for neighbour_val in domains[neighbour]:
+                    if not self.isValidPairwise(var,val,neighbour,neighbour_val):
+                        score += 1
+
+            score_list.append((score,val))
+        sorted_list = sorted(score_list)
+
+        var_list = [v[1] for v in sorted_list]
+
+        return var_list
+
 
     def solveAC3(self, initialAssignment: Dict[Variable, Value] = dict()) -> Optional[Dict[Variable, Value]]:
         """ Called to solve this CSP with AC3.
