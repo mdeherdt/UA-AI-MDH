@@ -252,8 +252,25 @@ class CSP(ABC):
             Use `CSP::ac3`.
             :return: a complete and valid assignment if one exists, None otherwise.
         """
-        # TODO: Implement CSP::_solveAC3 (problem 3)
-        pass
+        if self.isComplete(assignment):
+            return assignment
+
+        var = self.selectVariable(assignment,domains)
+
+        for value in self. orderDomain(assignment,domains,var):
+            assignment[var] = value
+
+            new_domains = self.ac3(assignment,domains,var)
+
+            is_dead_end = any(len(new_domains[v]) == 0 for v in self.remainingVariables(assignment))
+
+            if not is_dead_end:
+                result = self._solveAC3(assignment,new_domains)
+                return result
+
+            del assignment[var]
+
+        return None
 
     def ac3(self, assignment: Dict[Variable, Value], domains: Dict[Variable, Set[Value]], variable: Variable) -> Dict[Variable, Set[Value]]:
         """ Implement the AC3 algorithm from the theory lectures.
@@ -263,8 +280,39 @@ class CSP(ABC):
         :param variable: The variable that was just assigned (only need to check changes).
         :return: the new domains ensuring arc consistency.
         """
-        # TODO: Implement CSP::ac3 (problem 3)
-        pass
+        new_domains = copy.deepcopy(domains)
+
+        queue = []
+
+        for neighbor in self.neighbors(variable):
+            queue.append((neighbor,variable))
+
+
+        while queue:
+            (xi,xj) = queue.pop(0)
+
+            revised = False
+
+            for val_i in new_domains[xi].copy():
+
+                is_supported = False
+
+                for val_j in new_domains[xj]:
+                    if self.isValidPairwise(xi,val_i,xj,val_j):
+                        is_supported = True
+                        break
+
+                if not is_supported:
+                    new_domains[xi].remove(val_i)
+                    revised = True
+
+
+            if revised:
+                for xk in self.neighbors(xi):
+                    if xk != xj and xk not in assignment:
+                        queue.append((xk,xi))
+
+        return new_domains
 
 
 def domainsFromAssignment(assignment: Dict[Variable, Value], variables: Set[Variable]) -> Dict[Variable, Set[Value]]:

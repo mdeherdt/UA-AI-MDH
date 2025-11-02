@@ -115,7 +115,7 @@ class Cell(Variable):
             return {int(self.value)}
 
         return {v for v in range(1, 10)}
-    
+
     def hasValue(self):
         return self.value != 0
 
