@@ -7,27 +7,54 @@ class Sudoku(CSP):
     def __init__(self, MRV=True, LCV=True):
         super().__init__(MRV=MRV, LCV=LCV)
         # TODO: Implement Sudoku::__init__ (problem 4)
+        grid  = []
+        for i in range(9):
+            grid.append([Cell(i,j,0) for j in range(9)])
+        self.grid = grid
 
     @property
     def variables(self) -> Set['Cell']:
         """ Return the set of variables in this CSP. """
         # TODO: Implement Sudoku::variables (problem 4)
-        pass
+        vars = set()
+        for i in range(9):
+            for j in range(9):
+                vars.add(self.grid[i][j])
+        return vars
 
     def getCell(self, x: int, y: int) -> 'Cell':
         """ Get the  variable corresponding to the cell on (x, y) """
-        # TODO: Implement Sudoku::getCell (problem 4)
-        pass
+        return self.grid[y][x]
 
     def neighbors(self, var: 'Cell') -> Set['Cell']:
         """ Return all variables related to var by some constraint. """
-        # TODO: Implement Sudoku::neighbors (problem 4)
-        pass
+        neighbors_set = set()
+
+        neighbors_set.update(self.grid[var.row])
+
+        for i in range(9):
+            neighbors_set.add(self.grid[i][var.col])
+
+        start_row = (var.row //3) * 3
+        start_col = (var.col // 3) * 3
+
+        for r in range(start_row,start_row+3):
+            for c in range(start_col,start_col+3):
+                neighbors_set.add(self.grid[r][c])
+
+        neighbors_set.remove(var)
+
+        return neighbors_set
 
     def isValidPairwise(self, var1: 'Cell', val1: Value, var2: 'Cell', val2: Value) -> bool:
         """ Return whether this pairwise assignment is valid with the constraints of the csp. """
         # TODO: Implement Sudoku::isValidPairwise (problem 4)
-        pass
+
+        if val1 == val2:
+            return False
+        return True
+
+
 
     def assignmentToStr(self, assignment: Dict['Cell', Value]) -> str:
         """ Formats the assignment of variables for this CSP into a string. """
@@ -72,15 +99,24 @@ class Sudoku(CSP):
 
 
 class Cell(Variable):
-    def __init__(self):
+    def __init__(self,row = None,col = None, value = 0):
         super().__init__()
         # TODO: Implement Cell::__init__ (problem 4)
         # You can add parameters as well.
+        self.row = row
+        self.col = col
+        self.value = value
 
     @property
     def startDomain(self) -> Set[Value]:
         """ Returns the set of initial values of this variable (not taking constraints into account). """
         # TODO: Implement Cell::startDomain (problem 4)
-        pass
+        if self.hasValue():
+            return {int(self.value)}
+
+        return {v for v in range(1, 10)}
+    
+    def hasValue(self):
+        return self.value != 0
 
 
