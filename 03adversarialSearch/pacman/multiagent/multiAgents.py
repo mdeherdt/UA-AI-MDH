@@ -361,12 +361,6 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
 
 
 def betterEvaluationFunction(currentGameState: GameState):
-    """
-    Your extreme ghost-hunting, pellet-nabbing, food-gobbling, unstoppable
-    evaluation function (question 5).
-
-    DESCRIPTION:
-    """
     pac = currentGameState.getPacmanPosition()
     food = currentGameState.getFood().asList()
     ghosts = currentGameState.getGhostStates()
@@ -386,7 +380,7 @@ def betterEvaluationFunction(currentGameState: GameState):
         if g.scaredTimer > 0:
             value += 10.0 / (d + 1.0)
             if d == 0:
-                value += 50.0  # Hextra bonus: spook gegeten
+                value += 50.0
         else:
             if d <= 1:
                 value -= 1000.0

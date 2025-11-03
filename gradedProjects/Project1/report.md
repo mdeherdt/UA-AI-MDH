@@ -34,4 +34,16 @@
 ## Adversarial Search - Discuss evaluation function
 
 **Describe your evaluation function for question 4:**
-- [short description here]
+- Mijn evaluatiefunctie berekent een score voor een gegeven 'state' door een gewogen som van verschillende heuristische componenten te nemen. Het doel is om Pacman te sturen naar situaties die leiden tot een hogere score en winst, terwijl direct gevaar wordt vermeden.
+
+- De score wordt als volgt opgebouwd:
+    - **Basisscore:** De score begint met de huidige gamestate-score (`currentGameState.getScore()`). Dit vormt het fundament van de evaluatie.
+    - **Voedsel:**
+        - Er wordt een significante straf (`-4.0 * len(food)`) gegeven op basis van het aantal resterende voedselbolletjes. Dit moedigt de agent sterk aan om het level uit te spelen.
+        - Er wordt een bonus gegeven op basis van de nabijheid tot het dichtstbijzijnde voedselbolletje (`+ 3.0 / (d_food + 1.0)`). Dit zorgt ervoor dat Pacman actief naar voedsel zoekt en niet passief blijft.
+    - **Spoken (Ghosts):** Dit is het meest complexe en belangrijkste deel, opgesplitst in twee scenario's:
+        - **Bange Spoken (`scaredTimer > 0`):** Pacman wordt sterk aangemoedigd om bange spoken te achtervolgen. Hij krijgt een bonus voor nabijheid (`+ 10.0 / (d + 1.0)`) en een zeer grote extra bonus (`+ 50.0`) voor het daadwerkelijk 'opeten' van het spook (wanneer `d == 0`).
+        - **Actieve Spoken:** Overleving is hier prioriteit. Als een spook gevaarlijk dichtbij is (`d <= 1`), wordt een *extreem hoge negatieve penalty* (`-1000.0`) toegepast om deze situatie te allen tijde te vermijden. Voor actieve spoken die verder weg zijn, geldt een kleinere, afnemende penalty (`-5.0 / d`).
+    - **Capsules (Power Pellets):**
+        - Er wordt een strategische bonus toegepast voor het naderen van capsules (`+ 15.0 / (d_cap + 1.0)`).
+        - **Cruciaal:** Deze bonus wordt enkel geactiveerd als Pacman in direct gevaar is (`danger_close == True`). Dit moedigt de agent aan om capsules te gebruiken als een ontsnappingsmiddel, in plaats van ze onnodig te verbruiken.
