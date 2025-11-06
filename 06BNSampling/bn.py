@@ -1,9 +1,9 @@
 import re, random
 
 class DiscreteBN:
-    """Loads the Survey network directly from survey.net (Hugin format)."""
+    """Loads the Survey network directly from asia.net (Hugin format)."""
 
-    def __init__(self, net_path="survey.net"):
+    def __init__(self, net_path="asia.net"):
         with open(net_path, "r", encoding="utf-8") as f:
             txt = f.read()
 
