@@ -1,5 +1,4 @@
-# === constraints.py ===
-# Fill in add_constraints(model, X, parsed) using OR-Tools.
+# === constraints.py === Fill in add_constraints(model, X, parsed) using OR-Tools.
 # You must enforce:
 #   1) Row and column AllDifferent
 #   2) Givens (prefilled digits)
@@ -63,3 +62,21 @@ def add_constraints(model: "cp_model.CpModel", X, parsed):
             model.Add(top_var > bottom_var)
 
     pass
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

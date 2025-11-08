@@ -48,6 +48,28 @@ def rejection_sampling(bn: DiscreteBN, query, evidence, N, rng):
     """
     """TODO: implement this function"""
 
+    sample = 0
+    match = 0
+
+    for _ in range(N):
+        sample = bn.sample_prior(rng) # return assignment dict
+
+        is_consistent = True
+
+        for var,value in evidence.items():
+            if sample[var] != value:
+                is_consistent = False
+                break
+
+        if is_consistent:
+            sample += 1
+            if sample[query[0]] == query[1]:
+                match += 1
+
+    if sample == 0:
+        return None
+    return match / sample
+
     raise NotImplementedError
 
 
