@@ -48,7 +48,7 @@ def rejection_sampling(bn: DiscreteBN, query, evidence, N, rng):
     """
     """TODO: implement this function"""
 
-    sample = 0
+    consistent = 0
     match = 0
 
     for _ in range(N):
@@ -62,15 +62,14 @@ def rejection_sampling(bn: DiscreteBN, query, evidence, N, rng):
                 break
 
         if is_consistent:
-            sample += 1
+            consistent += 1
             if sample[query[0]] == query[1]:
                 match += 1
 
     if sample == 0:
         return None
-    return match / sample
+    return match / consistent
 
-    raise NotImplementedError
 
 
 def likelihood_weighting(bn: DiscreteBN, query, evidence, N, rng):
@@ -95,6 +94,41 @@ def likelihood_weighting(bn: DiscreteBN, query, evidence, N, rng):
         float: An estimate of P(query | evidence)
                (Normalized weighted probability for the query variable being its target value.)
     """
-    """TODO: implement this function"""
+    total_weight = 0.0
+    query_weight = 0.0
 
-    raise NotImplementedError
+    query_var = query[0]
+    query_val = query[1]
+
+    for _ in range(N):
+        sample_weight = 1.0
+        assignment = {}
+
+        for X in bn.topo_order: #itereert over alle variabelen in topologische volgorde
+            if X in evidence:
+                x_val = evidence[X]
+                assignment[X] = x_val
+
+                p = bn.local_prob(X, x_val, assignment)
+
+                sample_weight *= p
+
+            else:
+                states = bn.states[X]
+                probs = [bn.local_prob(X, s, assignment) for s in states]
+                r = rng.random() # willekeurig getal tussen 0 en 1
+                cum = 0.0 # cumulatieve kans
+                for s, p in zip(states, probs):
+                    cum += p
+                    if r <= cum:
+                        assignment[X] = s
+                        break
+        total_weight += sample_weight
+
+        if assignment[query_var] == query_val:
+            query_weight += sample_weight
+
+    if total_weight == 0:
+            return 0.0
+
+    return query_weight / total_weight
