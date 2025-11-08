@@ -26,9 +26,40 @@ from ortools.sat.python import cp_model
 def add_constraints(model: "cp_model.CpModel", X, parsed):
     N = parsed["N"]
     givens = parsed["givens"]
-    horiz  = parsed["horiz"]
-    vert   = parsed["vert"]
+    horiz = parsed["horiz"]  # (r, c) -> '<' of '>'
+    vert = parsed["vert"]  # (r, c) -> '^' of 'v'
 
-    # TODO: add the constrained on the model
+    for r in range(N):
+        model.AddAllDifferent(X[r])
+
+    for c in range(N):
+        column_vars = []
+        for r in range(N):
+            column_vars.append(X[r][c])
+        model.AddAllDifferent(column_vars)
+
+    for r in range(N):
+        for c in range(N):
+            value = givens[r][c]
+            if value is not None:
+                model.Add(X[r][c] == value)
+
+    for (r, c), symbol in horiz.items():
+        left_var = X[r][c]
+        right_var = X[r][c + 1]
+
+        if symbol == '<':
+            model.Add(left_var < right_var)
+        elif symbol == '>':
+            model.Add(left_var > right_var)
+
+    for (r, c), symbol in vert.items():
+        top_var = X[r][c]
+        bottom_var = X[r + 1][c]
+
+        if symbol == '^':
+            model.Add(top_var < bottom_var)
+        elif symbol == 'v':
+            model.Add(top_var > bottom_var)
 
     pass
