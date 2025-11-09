@@ -1,8 +1,8 @@
-# Artificial Intelligence - Report 2 
+# Artificial Intelligence - Report 3 
 
-**Name:** [First_name Last_name]
+**Name:** [Mathis De Herdt]
 
-**Student number:** [s01234..]
+**Student number:** [s0233480]
 
 
 ## Bayesian Networks (BN)
@@ -16,14 +16,14 @@ Compute the exact probability of:
 using the conditional probability tables from the appendix in the assignment.
 
 **Show your work:**  
-[Show your calculation step-by-step, or reference a PDF/image with your handwritten solution or solution on another program, e.g.:  
-“See attached file `BN_Q2.pdf`.”]
+See attached file `BN_Q2.pdf`
 
 **Exact Value:**  
-P(either=yes | xray=yes) = [value]
+P(either=yes | xray=yes) = 0,57603
 
-**Comparison:**  
-[Compare this value with your sampling result from Q1.]
+**Comparison:**   
+The sampling calculation was: 0.583924 this is slightly different from the exact value of 0.57603 which I manually calculated. The difference could be due to rounding errors or bad samples. However, the values are quite close, indicating that the approach used was generally correct.
+
 
 ---
 
@@ -34,10 +34,10 @@ Compute the exact probability
 P(either=yes | xray=yes, tub=yes).
 
 **Derivation:**  
-[Show or explain your work or reference a linked file.]
+See attached file `BN_Q3.pdf`
 
 **Exact Value:**  
-P(either=yes | xray=yes, tub=yes) = [value] 
+P(either=yes | xray=yes, tub=yes) = 1,0
 
 
 ---
@@ -46,15 +46,15 @@ P(either=yes | xray=yes, tub=yes) = [value]
 
 **Task:**  
 Determine whether each conditional independence statement holds in the Asia network.  
-If it does not hold, list at least one active path.
+If it does True at leas(no active path)
 
-| Statement                        | Independent? | Active Path (if any) |
-|----------------------------------|--------------|----------------------|
-| (a) asia ⟂ xray                  | [True/False] | [path if dependent] |
-| (b) tub ⟂ smoke \| either        | [True/False] | [path if dependent] |
-| (c) tub ⟂ bronc                  | [True/False] | [path if dependent] |
-| (d) tub ⟂ bronc \| dysp          | [True/False] | [path if dependent] |
-| (e) tub ⟂ bronc \| smoke, either | [True/False] | [path if dependent] |
+| Statement                        | Independent? | Active Path (if any)           |
+|----------------------------------|--------------|--------------------------------|
+| (a) asia ⟂ xray                  | False        | asia -> tub -> either -> xray  |
+| (b) tub ⟂ smoke \| either        | False        | tub -> either <- lung <- smoke |
+| (c) tub ⟂ bronc                  | True         | (no active path)               |
+| (d) tub ⟂ bronc \| dysp          | False        | tub -> either -> dysp <- bronc |
+| (e) tub ⟂ bronc \| smoke, either | True         | (no active path)               |
 
 ---
 
@@ -66,6 +66,6 @@ If it does not hold, list at least one active path.
 
 ## Notes
 
-If you used handwritten derivations or additional files, ensure they are readable and referenced explicitly in this report.
+I used handwritten calculations for the exact probabilities in Q2 and Q3. The derivations are included in the attached PDF files respectively `BN_Q2.pdf` and `BN_Q3.pdf` For Q4, I analyzed the network structure to determine d-separation and active paths. 
 
 ---
