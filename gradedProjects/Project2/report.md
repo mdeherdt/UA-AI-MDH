@@ -22,7 +22,7 @@ See attached file `BN_Q2.pdf`
 P(either=yes | xray=yes) = 0,57603
 
 **Comparison:**   
-The sampling calculation was: 0.583924 this is slightly different from the exact value of 0.57603 which I manually calculated. The difference could be due to rounding errors or bad samples. However, the values are quite close, indicating that the approach used was generally correct.
+The sampling calculation was: 0.575017 with N = 10000. This is slightly different from the exact value of 0.57603 which I manually calculated. The difference could be due to rounding errors or not enough samples. However, the values are quite close, indicating that the approach used was generally correct.
 
 
 ---
@@ -39,7 +39,8 @@ See attached file `BN_Q3.pdf`
 **Exact Value:**  
 P(either=yes | xray=yes, tub=yes) = 1,0
 
-
+**Comparison:**
+My sampling calculation yielded a value of 1.0 with N = 10000, which perfectly matches the exact value I calculated manually. This indicates that the sampling method was accurate in this case, likely due to the strong evidence provided by tub=yes, which directly influences the either variable.
 ---
 
 ## Q4: D-Separation
