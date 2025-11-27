@@ -14,14 +14,16 @@ Code: [Link](./code.zip)
 
 This project will be an introduction to machine learning; you will build a neural network to classify digits, and more!
 
-| **Files you'll edit:**               |                                                              |
-| ------------------------------------ | ------------------------------------------------------------ |
+| **Files you'll edit:**               |                                                            |
+|--------------------------------------| ---------------------------------------------------------- |
 | `models.py`                          | Perceptron and neural network models for a variety of applications. |
-| **Files you might want to look at:** |                                                              |
-| `nn.py`                              | Neural network mini-library.                                 |
-| **Supporting files you can ignore:** |                                                              |
-| `autograder.py`                      | Project autograder.                                          |
-| `backend.py`                         | Backend code for various machine learning tasks.             |
+| `train.py`                           | Training loops for your models. |
+| `losses.py`                          | Loss functions for your model. |
+| **Files you might want to look at:** |                                                            |
+| `nn.py`                              | Neural network mini-library.                               |
+| **Supporting files you can ignore:** |                                                            |
+| `autograder.py`                      | Project autograder.                                        |
+| `backend.py`                         | Backend code for various machine learning tasks.           |
 | `data`                               | Datasets for digit classification and language identification. |
 
 
@@ -117,12 +119,12 @@ Your tasks are as follows:
 
 - **Fill out the `init(self, dimensions)` function.** Initialize the weight parameter in `PerceptronModel` as a vector with shape $(1 \times \text{dimensions})$, where all components are set to the value `1`. Use the `torch.nn.Parameter()` and `torch.ones()` functions (already imported) to accomplish this. These functions ensure that PyTorch and our autograder recognize your weight as a parameter of your model.
 
-- **Implement the `run(self, x)` method.** This method should compute the dot product between the stored weight vector and the given input, returning a `Tensor` object. 
+- **Implement the `forward(self, x)` method.** This method should compute the dot product between the stored weight vector and the given input, returning a `Tensor` object. 
   - **Hint**: In PyTorch, to compute the matrix product of two tensors, `A` with shape $(m \times n)$ and `B` with shape $(n \times o)$, use the `@` operator: `res = A @ B`, resulting in a tensor `res` with shape $(m \times o)$. To transpose a tensor `A`, use `A.T` to get $A^T$.
 
 - **Implement `get_prediction(self, x)`.** This should return `1` if the dot product is non-negative and `−1` otherwise.
 
-- **Write the `train(self)` method.** This method should repeatedly loop over the dataset, updating weights for any misclassified examples. When a complete pass over the dataset is made without any mistakes, training has achieved 100% accuracy and can terminate.
+- **Write the `train_perceptron` method in `train.py`.** This method should repeatedly loop over the dataset, updating weights for any misclassified examples. When a complete pass over the dataset is made without any mistakes, training has achieved 100% accuracy and can terminate.
 
   Luckily, PyTorch makes it easy to run operations on tensors. If you would like to update your weight by some tensor `direction` and a constant `magnitude`, you can do it as follows: `self.w += direction * magnitude`
 
@@ -293,9 +295,9 @@ You will need to complete the implementation of the `RegressionModel` class in `
 Your tasks are to:
 
 - Implement `RegressionModel.__init__` with any needed initialization.
-- Implement `RegressionModel.run`(`RegressionModel.forward` in PyTorch) to return a `batch_size` by `1` node that represents your model’s prediction.
-- Implement `RegressionModel.get_loss` to return a loss for given inputs and target outputs.
-- Implement `RegressionModel.train`, which should train your model using gradient-based updates.
+- Implement `RegressionModel.forward` to return a `batch_size` by `1` node that represents your model’s prediction.
+- Implement `regression_loss` in `losses.py`, to return a loss for given inputs and target outputs.
+- Implement `train_regression` in `train.py`, which should train your model using gradient-based updates.
 
 There is only a single dataset split for this task (i.e., there is only training data and no validation data or test set). Your implementation will receive full points if it gets a loss of 0.02 or better, averaged across all examples in the dataset. You may use the training loss to determine when to stop training. Note that it should take the model a few minutes to train.
 
@@ -313,7 +315,7 @@ For this question, you will train a network to classify handwritten digits from 
 
 Each digit is of size `28` by `28` pixels, the values of which are stored in a `784`-dimensional vector of floating point numbers. Each output we provide is a `10`-dimensional vector which has zeros in all positions, except for a one in the position corresponding to the correct class of the digit.
 
-Complete the implementation of the `DigitClassificationModel` class in `models.py`. The return value from `DigitClassificationModel.run()` should be a `batch_size` by `10` node containing scores, where higher scores indicate a higher probability of a digit belonging to a particular class (0-9). You should use `cross_entropy` as your loss. Do not put a ReLU activation in the last linear layer of the network.
+Complete the implementation of the `DigitClassificationModel` class in `models.py`, the `train_digitclassifier` method in `train.py`, and the `digitclassifier_loss` in `losses.py`. The return value from `DigitClassificationModel.forward()` should be a `batch_size` by `10` node containing scores, where higher scores indicate a higher probability of a digit belonging to a particular class (0-9). You should use cross_entropy as your loss. Do not put a ReLU activation in the last linear layer of the network. 
 
 For both this question and Q4, in addition to training data, there is also validation data and a test set. You can use `dataset.get_validation_accuracy()` to compute validation accuracy for your model, which can be useful when deciding whether to stop training. The test set will be used by the autograder.
 
@@ -392,7 +394,7 @@ The design of the recurrent function $f(\cdot,\cdot)$ is the primary challenge f
 
 ### Your task
 
-Complete the implementation of the `LanguageIDModel` class.
+Complete the implementation of the `LanguageIDModel` class in `models.py`, the `train_langaugeid` method in `train.py`, and the `languageid_loss` method in `losses.py`.
 
 To receive full points on this problem, your architecture should be able to achieve an accuracy of at least 81% on the test set.
 
