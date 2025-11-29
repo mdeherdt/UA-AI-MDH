@@ -21,7 +21,7 @@ import inference
 import busters
 
 class NullGraphics:
-    "Placeholder for graphics"
+    "Plaatshouder voor graphics"
     def initialize(self, state, isBlue = False):
         pass
     def update(self, state):
@@ -37,10 +37,10 @@ class NullGraphics:
 
 class KeyboardInference(inference.InferenceModule):
     """
-    Basic inference module for use with the keyboard.
+    Basis inferentiemodule voor gebruik met het toetsenbord.
     """
     def initializeUniformly(self, gameState):
-        "Begin with a uniform distribution over ghost positions."
+        "Begin met een uniforme verdeling over spookposities."
         self.beliefs = util.Counter()
         for p in self.legalPositions: self.beliefs[p] = 1.0
         self.beliefs.normalize()
@@ -65,7 +65,7 @@ class KeyboardInference(inference.InferenceModule):
 
 
 class BustersAgent:
-    "An agent that tracks and displays its beliefs about ghost positions."
+    "Een agent die zijn overtuigingen over spookposities bijhoudt en weergeeft."
 
     def __init__( self, index = 0, inference = "ExactInference", ghostAgents = None, observeEnable = True, elapseTimeEnable = True):
         try:
@@ -77,7 +77,7 @@ class BustersAgent:
         self.elapseTimeEnable = elapseTimeEnable
 
     def registerInitialState(self, gameState):
-        "Initializes beliefs and inference modules"
+        "Initialiseert overtuigingen en inferentiemodules"
         import __main__
         self.display = __main__._display
         for inference in self.inferenceModules:
@@ -86,13 +86,13 @@ class BustersAgent:
         self.firstMove = True
 
     def observationFunction(self, gameState):
-        "Removes the ghost states from the gameState"
+        "Verwijdert de spooktoestanden uit de gameState"
         agents = gameState.data.agentStates
         gameState.data.agentStates = [agents[0]] + [None for i in range(1, len(agents))]
         return gameState
 
     def getAction(self, gameState):
-        "Updates beliefs, then chooses an action based on updated beliefs."
+        "Werkt overtuigingen bij en kiest vervolgens een actie op basis van bijgewerkte overtuigingen."
         for index, inf in enumerate(self.inferenceModules):
             if not self.firstMove and self.elapseTimeEnable:
                 inf.elapseTime(gameState)
@@ -104,11 +104,11 @@ class BustersAgent:
         return self.chooseAction(gameState)
 
     def chooseAction(self, gameState):
-        "By default, a BustersAgent just stops.  This should be overridden."
+        "Standaard stopt een BustersAgent gewoon. Dit moet worden overschreven."
         return Directions.STOP
 
 class BustersKeyboardAgent(BustersAgent, KeyboardAgent):
-    "An agent controlled by the keyboard that displays beliefs about ghost positions."
+    "Een agent bestuurd door het toetsenbord die overtuigingen over spookposities weergeeft."
 
     def __init__(self, index = 0, inference = "KeyboardInference", ghostAgents = None):
         KeyboardAgent.__init__(self, index)
@@ -125,10 +125,10 @@ from game import Actions
 from game import Directions
 
 class GreedyBustersAgent(BustersAgent):
-    "An agent that charges the closest ghost."
+    "Een agent die op de dichtstbijzijnde spook afstormt."
 
     def registerInitialState(self, gameState: busters.GameState):
-        "Pre-computes the distance between every two points."
+        "Berekent vooraf de afstand tussen elk tweetal punten."
         BustersAgent.registerInitialState(self, gameState)
         self.distancer = Distancer(gameState.data.layout, False)
 
@@ -138,9 +138,9 @@ class GreedyBustersAgent(BustersAgent):
 
     def chooseAction(self, gameState: busters.GameState):
         """
-        First computes the most likely position of each ghost that has
-        not yet been captured, then chooses an action that brings
-        Pacman closest to the closest ghost (according to mazeDistance!).
+        Berekent eerst de meest waarschijnlijke positie van elke spook die
+        nog niet is gevangen, en kiest vervolgens een actie die
+        Pacman het dichtst bij de dichtstbijzijnde spook brengt (volgens mazeDistance!).
         """
         pacmanPosition = gameState.getPacmanPosition()
         legal = [a for a in gameState.getLegalPacmanActions()]
@@ -149,14 +149,14 @@ class GreedyBustersAgent(BustersAgent):
             [beliefs for i, beliefs in enumerate(self.ghostBeliefs)
              if livingGhosts[i+1]]
 
-        # Find the most likely position of each ghost
+        # Vind de meest waarschijnlijke positie van elke spook
         mostLikelyPositions = [dist.argMax() for dist in livingGhostPositionDistributions]
 
-        # If there are no living ghosts, return a random legal action
+        # Als er geen levende spoken zijn, retourneer een willekeurige legale actie
         if not mostLikelyPositions:
             return random.choice(legal)
 
-        # Find the closest ghost
+        # Vind de dichtstbijzijnde spook
         closestGhostDistance = float('inf')
         closestGhostPosition = None
 
@@ -166,7 +166,7 @@ class GreedyBustersAgent(BustersAgent):
                 closestGhostDistance = distance
                 closestGhostPosition = ghostPos
 
-        # Choose the action that minimizes the distance to the closest ghost
+        # Kies de actie die de afstand tot de dichtstbijzijnde spook minimaliseert
         bestAction = None
         minDistance = float('inf')
 

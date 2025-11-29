@@ -46,7 +46,7 @@ def constructBayesNet(gameState: hunters.GameState):
           it's non-negative and |obs - true| <= MAX_NOISE
     - this uses slightly simplified mechanics vs the ones used later for simplicity
     """
-    # constants to use
+    # constanten om te gebruiken
     PAC = "Pacman"
     GHOST0 = "Ghost0"
     GHOST1 = "Ghost1"
@@ -87,36 +87,36 @@ def inferenceByEnumeration(bayesNet: bn, queryVariables: List[str], evidenceDict
     joinFactorsByVariable = joinFactorsByVariableWithCallTracking(callTrackingList)
     eliminate = eliminateWithCallTracking(callTrackingList)
 
-    # initialize return variables and the variables to eliminate
+    # initialiseer return variabelen en de variabelen om te elimineren
     evidenceVariablesSet = set(evidenceDict.keys())
     queryVariablesSet = set(queryVariables)
     eliminationVariables = (bayesNet.variablesSet() - evidenceVariablesSet) - queryVariablesSet
 
-    # grab all factors where we know the evidence variables (to reduce the size of the tables)
+    # verzamel alle factoren waar we de evidence variabelen kennen (om de grootte van de tabellen te verminderen)
     currentFactorsList = bayesNet.getAllCPTsWithEvidence(evidenceDict)
 
-    # join all factors by variable
+    # combineer alle factoren per variabele
     for joinVariable in bayesNet.variablesSet():
         currentFactorsList, joinedFactor = joinFactorsByVariable(currentFactorsList, joinVariable)
         currentFactorsList.append(joinedFactor)
 
-    # currentFactorsList should contain the connected components of the graph now as factors, must join the connected components
+    # currentFactorsList moet nu de verbonden componenten van de graaf bevatten als factoren, moet de verbonden componenten samenvoegen
     fullJoint = joinFactors(currentFactorsList)
 
-    # marginalize all variables that aren't query or evidence
+    # marginaliseer alle variabelen die geen query of evidence zijn
     incrementallyMarginalizedJoint = fullJoint
     for eliminationVariable in eliminationVariables:
         incrementallyMarginalizedJoint = eliminate(incrementallyMarginalizedJoint, eliminationVariable)
 
     fullJointOverQueryAndEvidence = incrementallyMarginalizedJoint
 
-    # normalize so that the probability sums to one
-    # the input factor contains only the query variables and the evidence variables, 
-    # both as unconditioned variables
+    # normaliseer zodat de kans optelt tot één
+    # de invoerfactor bevat alleen de query variabelen en de evidence variabelen,
+    # beide als ongeconditioneerde variabelen
     queryConditionedOnEvidence = normalize(fullJointOverQueryAndEvidence)
-    # now the factor is conditioned on the evidence variables
+    # nu is de factor geconditioneerd op de evidence variabelen
 
-    # the order is join on all variables, then eliminate on all elimination variables
+    # de volgorde is: combineer alle variabelen, elimineer dan alle eliminatie-variabelen
     return queryConditionedOnEvidence
 
 ########### ########### ###########
@@ -173,10 +173,10 @@ def inferenceByVariableEliminationWithCallTracking(callTrackingList=None):
         joinFactors
         """
 
-        # this is for autograding -- don't modify
+        # dit is voor automatisch nakijken -- niet aanpassen
         joinFactorsByVariable = joinFactorsByVariableWithCallTracking(callTrackingList)
         eliminate             = eliminateWithCallTracking(callTrackingList)
-        if eliminationOrder is None: # set an arbitrary elimination order if None given
+        if eliminationOrder is None: # stel een willekeurige eliminatievolgorde in als None is gegeven
             eliminationVariables = bayesNet.variablesSet() - set(queryVariables) -\
                                    set(evidenceDict.keys())
             eliminationOrder = sorted(list(eliminationVariables))
@@ -226,25 +226,25 @@ def sampleFromFactorRandomSource(randomSource=None):
                                 "conditionedVariables: " + str(conditionedVariables) + "\n" +
                                 "factor.conditionedVariables: " + str(set(factor.conditionedVariables())))
 
-            # Reduce the domains of the variables that have been
-            # conditioned upon for this factor 
+            # Beperk de domeinen van de variabelen waarop
+            # geconditioneerd is voor deze factor
             newVariableDomainsDict = factor.variableDomainsDict()
             for (var, assignment) in conditionedAssignments.items():
                 newVariableDomainsDict[var] = [assignment]
 
-            # Get the (hopefully) smaller conditional probability table
-            # for this variable 
+            # Verkrijg de (hopelijk) kleinere conditionele kanstabel
+            # voor deze variabele
             CPT = factor.specializeVariableDomains(newVariableDomainsDict)
         else:
             CPT = factor
 
-        # Get the probability of each row of the table (along with the
-        # assignmentDict that it corresponds to)
+        # Verkrijg de kans van elke rij in de tabel (samen met de
+        # assignmentDict waarmee het overeenkomt)
         assignmentDicts = sorted([assignmentDict for assignmentDict in CPT.getAllPossibleAssignmentDicts()])
         assignmentDictProbabilities = [CPT.getProbability(assignmentDict) for assignmentDict in assignmentDicts]
 
-        # calculate total probability in the factor and index each row by the 
-        # cumulative sum of probability up to and including that row
+        # bereken totale kans in de factor en indexeer elke rij op basis van de
+        # cumulatieve som van de kans tot en met die rij
         currentProbability = 0.0
         probabilityRange = []
         for i in range(len(assignmentDicts)):
@@ -253,8 +253,8 @@ def sampleFromFactorRandomSource(randomSource=None):
 
         totalProbability = probabilityRange[-1]
 
-        # sample an assignment with probability equal to the probability in the row 
-        # for that assignment in the factor
+        # trek een toewijzing met een kans gelijk aan de kans in de rij
+        # voor die toewijzing in de factor
         pick = randomSource.uniform(0.0, totalProbability)
         for i in range(len(assignmentDicts)):
             if pick <= probabilityRange[i]:
@@ -324,7 +324,7 @@ class DiscreteDistribution(dict):
         """
         total = self.total()
         if total == 0:
-            return  # Do nothing if total is 0
+            return  # Doe niets als totaal 0 is
 
         for key in self:
             self[key] = self[key] / total
@@ -341,7 +341,7 @@ class DiscreteDistribution(dict):
         >>> dist['d'] = 0
         >>> N = 100000.0
         >>> samples = [dist.sample() for _ in range(int(N))]
-        >>> round(samples.count('a') * 1.0/N, 1)  # proportion of 'a'
+        >>> round(samples.count('a') * 1.0/N, 1)  # proportie van 'a'
         0.2
         >>> round(samples.count('b') * 1.0/N, 1)
         0.4
@@ -353,18 +353,18 @@ class DiscreteDistribution(dict):
         if self.total() == 0:
             return None
 
-        # Get items and sort them for consistent ordering
+        # Haal items op en sorteer ze voor consistente volgorde
         items = sorted(self.items())
         keys = [item[0] for item in items]
         values = [item[1] for item in items]
 
-        # Normalize the distribution if it's not already normalized
+        # Normaliseer de verdeling als deze nog niet genormaliseerd is
         distribution = values
         if sum(distribution) != 1:
             total = sum(distribution)
             distribution = [val / total for val in distribution]
 
-        # Choose a random value and find the corresponding key
+        # Kies een willekeurige waarde en vind de bijbehorende sleutel
         choice = random.random()
         i, total = 0, distribution[0]
         while choice > total and i < len(distribution) - 1:
@@ -379,7 +379,7 @@ class InferenceModule:
     An inference module tracks a belief distribution over a ghost's location.
     """
     ############################################
-    # Useful methods for all inference modules #
+    # Nuttige methoden voor alle inferentiemodules #
     ############################################
 
     def __init__(self, ghostAgent):
@@ -388,7 +388,7 @@ class InferenceModule:
         """
         self.ghostAgent = ghostAgent
         self.index = ghostAgent.index
-        self.obs = []  # most recent observation position
+        self.obs = []  # meest recente observatiepositie
 
     def getJailPosition(self):
         return (2 * self.ghostAgent.index - 1, 1)
@@ -401,14 +401,14 @@ class InferenceModule:
             jail = self.getJailPosition(index)
             gameState = self.setGhostPositions(gameState, pos)
         pacmanPosition = gameState.getPacmanPosition()
-        ghostPosition = gameState.getGhostPosition(index + 1)  # The position you set
+        ghostPosition = gameState.getGhostPosition(index + 1)  # De positie die je instelt
         dist = DiscreteDistribution()
-        if pacmanPosition == ghostPosition:  # The ghost has been caught!
+        if pacmanPosition == ghostPosition:  # De spook is gevangen!
             dist[jail] = 1.0
             return dist
         pacmanSuccessorStates = game.Actions.getLegalNeighbors(pacmanPosition, \
-                gameState.getWalls())  # Positions Pacman can move to
-        if ghostPosition in pacmanSuccessorStates:  # Ghost could get caught
+                gameState.getWalls())  # Posities waar Pacman naartoe kan bewegen
+        if ghostPosition in pacmanSuccessorStates:  # Spook kan gevangen worden
             mult = 1.0 / float(len(pacmanSuccessorStates))
             dist[jail] = mult
         else:
@@ -416,7 +416,7 @@ class InferenceModule:
         actionDist = agent.getDistribution(gameState)
         for action, prob in actionDist.items():
             successorPosition = game.Actions.getSuccessor(ghostPosition, action)
-            if successorPosition in pacmanSuccessorStates:  # Ghost could get caught
+            if successorPosition in pacmanSuccessorStates:  # Spook kan gevangen worden
                 denom = float(len(actionDist))
                 dist[jail] += prob * (1.0 / denom) * (1.0 - mult)
                 dist[successorPosition] = prob * ((denom - 1.0) / denom) * (1.0 - mult)
@@ -444,21 +444,21 @@ class InferenceModule:
         """
         Return the probability P(noisyDistance | pacmanPosition, ghostPosition).
         """
-        # Check if the ghost is in jail
+        # Controleer of de spook in de gevangenis zit
         if ghostPosition == jailPosition:
             if noisyDistance is None:
                 return 1.0
             else:
                 return 0.0
 
-        # Check if the observation is None
+        # Controleer of de observatie None is
         if noisyDistance is None:
             return 0.0
 
-        # Calculate the true distance
+        # Bereken de werkelijke afstand
         trueDistance = manhattanDistance(pacmanPosition, ghostPosition)
 
-        # Get the observation probability
+        # Verkrijg de observatiekans
         return busters.getObservationProbability(noisyDistance, trueDistance)
 
     def setGhostPosition(self, gameState, ghostPosition, index):
@@ -493,7 +493,7 @@ class InferenceModule:
         Collect the relevant noisy distance observation and pass it along.
         """
         distances = gameState.getNoisyGhostDistances()
-        if len(distances) >= self.index:  # Check for missing observations
+        if len(distances) >= self.index:  # Controleer op ontbrekende observaties
             obs = distances[self.index - 1]
             self.obs = obs
             self.observeUpdate(obs, gameState)
@@ -507,7 +507,7 @@ class InferenceModule:
         self.initializeUniformly(gameState)
 
     ######################################
-    # Methods that need to be overridden #
+    # Methoden die moeten worden overschreven #
     ######################################
 
     def initializeUniformly(self, gameState):
@@ -573,12 +573,12 @@ class ExactInference(InferenceModule):
         pacmanPosition = gameState.getPacmanPosition()
         jailPosition = self.getJailPosition()
 
-        # Update the belief at each position based on the observation
+        # Update de belief op elke positie op basis van de observatie
         for position in self.allPositions:
-            # Calculate P(observation | ghost position, pacman position)
+            # Bereken P(observatie | spook positie, pacman positie)
             observationProb = self.getObservationProb(observation, pacmanPosition, position, jailPosition)
 
-            # Update the belief using Bayes' rule: P(ghost position | observation) ∝ P(observation | ghost position) * P(ghost position)
+            # Update de belief met behulp van Bayes' regel: P(spook positie | observatie) ∝ P(observatie | spook positie) * P(spook positie)
             self.beliefs[position] = observationProb * self.beliefs[position]
 
         self.beliefs.normalize()
