@@ -11,7 +11,7 @@ print("Using device:", device)
 
 
 # 2. LOAD CHECKPOINT (MODEL + CLASSES)
-checkpoint_path = "cifar10_cnn.pth"
+checkpoint_path = "cifar10_cnn_student.pth"
 
 checkpoint = torch.load(checkpoint_path, map_location=device)
 model = MyCNN().to(device)
